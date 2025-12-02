@@ -17,6 +17,7 @@ repositories {
 dependencies {
     // Aparapi for GPU computing
     implementation 'com.aparapi:aparapi:3.0.0'
+    implementation 'org.jocl:jocl:2.0.2'
 
     // JSON処理
     implementation 'org.json:json:20231013'
