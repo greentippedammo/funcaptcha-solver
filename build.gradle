@@ -1,0 +1,78 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'wtf.novoline'
+version = '1.0.0'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Aparapi for GPU computing
+    implementation 'com.aparapi:aparapi:3.0.0'
+
+    // JSON処理
+    implementation 'org.json:json:20231013'
+
+    // Logging (オプション)
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
+}
+
+application {
+    mainClass = 'wtf.novoline.Main'
+}
+
+// JARビルド設定
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'wtf.novoline.Main',
+                'Implementation-Version': version
+        )
+    }
+}
+
+// Fat JAR作成 (すべての依存関係を含む実行可能JAR)
+shadowJar {
+    archiveBaseName.set('TKServerPoW')
+    archiveClassifier.set('')
+    archiveVersion.set(version)
+
+    manifest {
+        attributes(
+                'Main-Class': 'wtf.novoline.Main'
+        )
+    }
+}
+
+// タスク設定
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+// 実行タスク
+task run_w(type: JavaExec) {
+    group = 'application'
+    mainClass = 'wtf.novoline.Main'
+    classpath = sourceSets.main.runtimeClasspath
+
+    // 標準入力を有効化
+    standardInput = System.in
+}
+
+// ビルド時にshadowJarを自動実行
+build.dependsOn shadowJar
+
+// クリーンビルド用タスク
+task cleanBuild {
+    dependsOn clean, shadowJar
+    description = 'クリーン後にFat JARをビルド'
+    group = 'build'
+}
